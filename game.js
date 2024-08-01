@@ -19,7 +19,7 @@ $(".btn").click(function() {
         $(this).removeClass("pressed");
     }, 100);
     playSound(this.id);
-    result(userSequence.length - 1);
+    result(userSequence);
 });
 
 // next squence
@@ -34,8 +34,12 @@ function nextSequence() {
 }
 // check result
 function result(color) {
-    if (gameSequence[color] === userSequence[userSequence.length - 1]) {
-        nextSequence();
+    if (gameSequence[color.length - 1] === userSequence[color.length - 1]) {
+        if (gameSequence.length === userSequence.length) {
+            setTimeout(() => {
+                nextSequence();
+            }, 1000);
+        }
     } else {
         var wrong = "wrong";
         $("body").addClass("game-over");
