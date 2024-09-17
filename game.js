@@ -1,68 +1,60 @@
-var color = ["red", "green", "blue", "yellow"];
-
-var gamePattern = [];
-var userPattern = [];
-
-var flag = false;
+var userClickSequence = [];
+var gameSequence = [];
+var colors = ["green", "red", "blue", "yellow"];
+var start = false;
 var level = 0;
-
-$("body").keydown(function() {
-    if (!flag) {
+$("body").on("keydown", function() {
+    if (!start) {
         $("h1").text("Level 0");
         nextSequence();
-        flag = true;
-    };
+        start = true;
+    }
 });
-
-$(".btn").click(function() {
-    userPattern.push(this.id);
+$(".btn").on("click", function() {
+    userClickSequence.push(this.id);
     playSound(this.id);
-    animate(this.id);
-    checkAnswer(userPattern.length - 1);
+    $(`.${this.id}`).addClass("pressed");
+    setTimeout(() => {
+        $(`.${this.id}`).removeClass("pressed");
+    }, 300);
+    checkResult(userClickSequence.length - 1);
 });
 
 function nextSequence() {
-    $("h1").text("Level " + level);
-    var randomNumber = Math.floor(Math.random() * 3);
-    gamePattern.push(color[randomNumber]);
-    $(`.${color[randomNumber]}`).fadeOut().fadeIn().fadeOut().fadeIn();
-    playSound(color[randomNumber]);
+    $("h1").text(`Level ${level}`);
+    var randomNumber = Math.floor(Math.random() * colors.length);
+    gameSequence.push(colors[randomNumber]);
+    $(`.${colors[randomNumber]}`).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
+    playSound(colors[randomNumber]);
     level++;
 }
 
-function checkAnswer(currentLevel) {
-    if (userPattern[currentLevel] === gamePattern[currentLevel]) {
-        if (userPattern.length === gamePattern.length) {
+function checkResult(id) {
+    if (gameSequence[id] === userClickSequence[id]) {
+        if (gameSequence.length === userClickSequence.length) {
             setTimeout(() => {
                 nextSequence();
             }, 1000);
-            userPattern = [];
+            userClickSequence = [];
         }
     } else {
         $("body").addClass("game-over");
         setTimeout(() => {
             $("body").removeClass("game-over");
-        }, 300);
+        }, 1000);
         var wrong = "wrong";
         playSound(wrong);
-        $("h1").text("Game over, press any key to start again!");
-        flag = false;
+        $("h1").text(`Game Over, press any key to start again!`);
+        start = false;
         level = 0;
-        gamePattern = [];
-        userPattern = [];
+        gameSequence = [];
+        userClickSequence = [];
     }
-    console.log("Game Sequence: " + gamePattern);
-    console.log("User Sequence: " + userPattern);
+    console.log(gameSequence);
+    console.log(userClickSequence);
 }
 
-function playSound(name) {
-    var sound = new Audio("sounds/" + name + ".mp3");
+function playSound(id) {
+    var sound = new Audio(`sounds/${id}.mp3`);
     sound.play();
-}
-
-function animate(name) {
-    $(`.${name}`).addClass("pressed");
-    setTimeout(() => {
-        $(`.${name}`).removeClass("pressed");
-    }, 200);
 }
